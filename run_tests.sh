@@ -1,3 +1,7 @@
 #!/bin/sh
 
-mvn --offline test ${@}
+mvn \
+    --batch-mode \
+    --no-transfer-progress \
+    --offline \
+    clean compile test "${@}"

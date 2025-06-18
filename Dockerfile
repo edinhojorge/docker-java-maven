@@ -5,27 +5,18 @@ WORKDIR /app
 # Copy POM first to leverage Docker cache for dependencies
 COPY pom.xml ./
 
-# Download all dependencies and plugins at once
-# This ensures everything needed for offline mode is cached
+# Download all dependencies and plugins independently
+# This layer will be cached unless pom.xml changes
 RUN mvn \
     --batch-mode \
     --no-transfer-progress \
     dependency:go-offline \
     dependency:resolve-plugins \
     dependency:resolve \
-    dependency:sources \
-    clean compile test-compile \
-    -DskipTests=true
+    dependency:sources
 
-# Copy source code
+# Copy source code after dependencies are downloaded
 COPY src ./src
-
-# Run compilation and tests in offline mode
-RUN mvn \
-    --batch-mode \
-    --no-transfer-progress \
-    --offline \
-    clean compile test
 
 COPY run_tests.sh ./
 
